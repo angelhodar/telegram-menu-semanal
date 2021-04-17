@@ -1,5 +1,5 @@
 import os
-from random import sample
+from random import sample, choice
 from dotenv import load_dotenv
 from pyrogram import Client, filters
 
@@ -52,6 +52,17 @@ recipes = {
         "Cebolla pochada con patatas, guiantes y jamón",
         "Wantu",
         "Gyozas"
+    ],
+    "desserts": [
+        "Arroz con leche",
+        "Natillas",
+        "Torrijas",
+        "Leche frita",
+        "Tarta de queso",
+        "Crema catalana",
+        "Flan",
+        "Bizcocho",
+        "Quesada"
     ]
 }
 
@@ -61,20 +72,21 @@ help_message = "Usa el comando /menu para obtener un menu semanal aleatorio"
 def create_menu():
     weekdays = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes"]
     weekend = ["Sabado", "Domingo"]
+    dessert = f"Postre - {choice(recipes['desserts'])}"
 
     wd_recipes = sample(recipes["weekdays"], 5)
     we_recipes = sample(recipes["weekend"], 2)
 
-    weekdays_menu = [f"{d} - {r}" for d, r in zip(weekdays, wd_recipes)]
-    weekend_menu = [f"{d} - {r}" for d, r in zip(weekend, we_recipes)]
+    weekdays_menu = "\n".join([f"{d} - {r}" for d, r in zip(weekdays, wd_recipes)])
+    weekend_menu = "\n".join([f"{d} - {r}" for d, r in zip(weekend, we_recipes)])
 
-    return "\n".join(weekdays_menu), "\n".join(weekend_menu)
+    return weekdays_menu, weekend_menu, dessert
 
 def send_menu(client, chat_id):
-    weekday_menu, weekend_menu = create_menu()
+    weekday_menu, weekend_menu, dessert = create_menu()
     client.send_message(chat_id=chat_id, text=weekday_menu)
     client.send_message(chat_id=chat_id, text=weekend_menu)
-
+    client.send_message(chat_id=chat_id, text=dessert)
 
 @app.on_message(filters.command("menu"))
 def menu(client, message):
